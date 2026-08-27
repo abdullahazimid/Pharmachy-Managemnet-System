@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Transactions - Khan Pharmacy</title>
+    <link rel="stylesheet" href="../css/medicine.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Khan Pharmacy</h2>
+        <ul>
+            <li onclick="location.href='dashboard.html'">Dashboard</li>
+            <li onclick="location.href='users.html'">Users & Roles</li>
+            <li onclick="location.href='medicines.html'">Medicines</li>
+            <li onclick="location.href='suppliers.html'">Suppliers</li>
+            <li onclick="location.href='antibiotics.html'">Antibiotics List</li>
+            <li onclick="location.href='inventory.html'">Stock & Inventory</li>
+            <li class="active" onclick="location.href='sales.html'">Sales Transactions</li>
+            <li onclick="location.href='reports.html'">Financial Reports</li>
+            <li onclick="location.href='salaries.html'">Employee Salaries</li>
+            <li onclick="location.href='invoices.html'">Invoices & Receipts</li>
+            <li onclick="location.href='customers.html'">Customers</li>
+            <li onclick="location.href='../index.html'">Logout</li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <h1>Sales & Purchase Transactions</h1>
+            <button class="add-btn">+ New Sale</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Sales ID</th>
+                    <th>Medicine Sold</th>
+                    <th>Quantity Sold</th>
+                    <th>Sale Date</th>
+                    <th>Total Price</th>
+                    <th>Discount (%)</th>
+                    <th>Payment Method</th>
+                    <th>Sold By (User)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>SLS-001</td>
+                    <td><strong>Napa Extra</strong> (#1)</td>
+                    <td>10 units</td>
+                    <td>2026-07-23 10:15</td>
+                    <td>100.00 Tk</td>
+                    <td>0%</td>
+                    <td><span class="badge badge-cash">Cash</span></td>
+                    <td>Azim</td>
+                    <td>
+                        <button class="view">Details</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>SLS-002</td>
+                    <td><strong>Seclo 20mg</strong> (#2)</td>
+                    <td>5 units</td>
+                    <td>2026-07-23 11:40</td>
+                    <td>57.00 Tk</td>
+                    <td>5%</td>
+                    <td><span class="badge badge-cash">Cash</span></td>
+                    <td>Ontim</td>
+                    <td>
+                        <button class="view">Details</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>SLS-003</td>
+                    <td><strong>Ciprocin 500mg</strong> (#4)</td>
+                    <td>2 units</td>
+                    <td>2026-07-23 14:05</td>
+                    <td>50.00 Tk</td>
+                    <td>0%</td>
+                    <td><span class="badge badge-cash">Cash</span></td>
+                    <td>Sabreen</td>
+                    <td>
+                        <button class="view">Details</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>

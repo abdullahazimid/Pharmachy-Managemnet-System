@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User & Role Management - Khan Pharmacy</title>
+    <link rel="stylesheet" href="../css/medicine.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Khan Pharmacy</h2>
+        <ul>
+            <li onclick="location.href='dashboard.html'">Dashboard</li>
+            <li class="active" onclick="location.href='users.html'">Users & Roles</li>
+            <li onclick="location.href='medicines.html'">Medicines</li>
+            <li onclick="location.href='suppliers.html'">Suppliers</li>
+            <li onclick="location.href='antibiotics.html'">Antibiotics List</li>
+            <li onclick="location.href='inventory.html'">Stock & Inventory</li>
+            <li onclick="location.href='sales.html'">Sales Transactions</li>
+            <li onclick="location.href='reports.html'">Financial Reports</li>
+            <li onclick="location.href='salaries.html'">Employee Salaries</li>
+            <li onclick="location.href='invoices.html'">Invoices & Receipts</li>
+            <li onclick="location.href='customers.html'">Customers</li>
+            <li onclick="location.href='../index.html'">Logout</li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <h1>User & Login Management</h1>
+            <button class="add-btn">+ Add New User</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>User ID</th>
+                    <th>Full Name</th>
+                    <th>Role</th>
+                    <th>Username</th>
+                    <th>Email Address</th>
+                    <th>Password Reset</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>USR-001</td>
+                    <td><strong>Admin User</strong></td>
+                    <td><span class="badge badge-admin">Admin</span></td>
+                    <td>admin</td>
+                    <td>admin@khanpharmacy.com</td>
+                    <td><button class="view">Reset Password</button></td>
+                    <td>
+                        <button class="edit">Edit</button>
+                        <button class="delete">Delete</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>USR-002</td>
+                    <td><strong>Dr. Rafiq Islam</strong></td>
+                    <td><span class="badge badge-pharmacist">Pharmacist</span></td>
+                    <td>rafiq</td>
+                    <td>rafiq@khanpharmacy.com</td>
+                    <td><button class="view">Reset Password</button></td>
+                    <td>
+                        <button class="edit">Edit</button>
+                        <button class="delete">Delete</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>USR-003</td>
+                    <td><strong>Tariq Hassan</strong></td>
+                    <td><span class="badge badge-employee">Employee</span></td>
+                    <td>tariq</td>
+                    <td>tariq@khanpharmacy.com</td>
+                    <td><button class="view">Reset Password</button></td>
+                    <td>
+                        <button class="edit">Edit</button>
+                        <button class="delete">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>

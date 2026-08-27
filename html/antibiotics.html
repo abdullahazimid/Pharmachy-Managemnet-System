@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antibiotics List - Khan Pharmacy</title>
+    <link rel="stylesheet" href="../css/medicine.css">
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>Khan Pharmacy</h2>
+        <ul>
+            <li onclick="location.href='dashboard.html'">Dashboard</li>
+            <li onclick="location.href='users.html'">Users & Roles</li>
+            <li onclick="location.href='medicines.html'">Medicines</li>
+            <li onclick="location.href='suppliers.html'">Suppliers</li>
+            <li class="active" onclick="location.href='antibiotics.html'">Antibiotics List</li>
+            <li onclick="location.href='inventory.html'">Stock & Inventory</li>
+            <li onclick="location.href='sales.html'">Sales Transactions</li>
+            <li onclick="location.href='reports.html'">Financial Reports</li>
+            <li onclick="location.href='salaries.html'">Employee Salaries</li>
+            <li onclick="location.href='invoices.html'">Invoices & Receipts</li>
+            <li onclick="location.href='customers.html'">Customers</li>
+            <li onclick="location.href='../index.html'">Logout</li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <h1>Antibiotics List (Restricted Access)</h1>
+            <button class="add-btn">+ Register Antibiotic</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Antibiotic ID</th>
+                    <th>Medicine Name (ID)</th>
+                    <th>Allowed Range / Limit</th>
+                    <th>Current Stock Level</th>
+                    <th>Alert Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>ANT-001</td>
+                    <td><strong>Ciprocin 500mg</strong> (#4)</td>
+                    <td>Max 10 units / script</td>
+                    <td>45 units</td>
+                    <td><span class="badge badge-normal">Normal</span></td>
+                    <td>
+                        <button class="edit">Edit Limit</button>
+                        <button class="delete">Remove</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>ANT-002</td>
+                    <td><strong>Azithrocin 500mg</strong> (#5)</td>
+                    <td>Max 6 units / script</td>
+                    <td>30 units</td>
+                    <td><span class="badge badge-warning">Warning</span></td>
+                    <td>
+                        <button class="edit">Edit Limit</button>
+                        <button class="delete">Remove</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>ANT-003</td>
+                    <td><strong>Moxaclav 625mg</strong> (#7)</td>
+                    <td>Max 5 units / script</td>
+                    <td>15 units</td>
+                    <td><span class="badge badge-warning">Low</span></td>
+                    <td>
+                        <button class="edit">Edit Limit</button>
+                        <button class="delete">Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+
+</html>

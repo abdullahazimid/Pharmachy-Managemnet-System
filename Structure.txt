@@ -1,0 +1,32 @@
+Pharmacy-Management-System/
+│
+├── index.html
+├── Structure.txt
+│
+├── css/
+│     style.css
+│     dashboard.css
+│     medicine.css
+│
+├── html/
+│     dashboard.html
+│     users.html
+│     medicines.html
+│     suppliers.html
+│     antibiotics.html
+│     inventory.html
+│     sales.html
+│     reports.html
+│     salaries.html
+│     invoices.html
+│     customers.html
+│
+├── js/
+│     script.js
+│
+├── php/
+│     db.php
+│     api.php
+│
+└── database/
+      pharmacy.sql
