@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import Modal from '../components/Modal';
+import FilterToolbar, { FilterSelect } from '../components/FilterToolbar';
+import { matchSearch, uniqueValues } from '../utils/tableFilter';
 
 const empty = { supplier_name: '', contact_no: '', address: '', company_name: '' };
 
@@ -10,6 +12,25 @@ export default function Suppliers() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(empty);
+  const [search, setSearch] = useState('');
+  const [filterCompany, setFilterCompany] = useState('');
+
+  const companies = useMemo(() => uniqueValues(rows, 'company_name'), [rows]);
+
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((r) => {
+        if (filterCompany && r.company_name !== filterCompany) return false;
+        return matchSearch(r, search, [
+          'supplier_id',
+          'supplier_name',
+          'company_name',
+          'contact_no',
+          'address',
+        ]);
+      }),
+    [rows, search, filterCompany],
+  );
 
   async function load() {
     try {
@@ -76,8 +97,22 @@ export default function Suppliers() {
         </button>
       </div>
       {error && <p className="error-text">{error}</p>}
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by name, company, contact, ID..."
+      >
+        <FilterSelect
+          value={filterCompany}
+          onChange={setFilterCompany}
+          allLabel="All Companies"
+          options={companies.map((c) => ({ value: c, label: c }))}
+        />
+      </FilterToolbar>
       {rows.length === 0 ? (
         <div className="empty-state">No suppliers found</div>
+      ) : filteredRows.length === 0 ? (
+        <div className="empty-state">No suppliers match your search or filters</div>
       ) : (
         <table>
           <thead>
@@ -91,7 +126,7 @@ export default function Suppliers() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
+            {filteredRows.map((r) => (
               <tr key={r.supplier_id}>
                 <td>{r.supplier_id}</td>
                 <td>{r.supplier_name}</td>

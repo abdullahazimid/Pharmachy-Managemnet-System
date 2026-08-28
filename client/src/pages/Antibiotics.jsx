@@ -1,7 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import Modal from '../components/Modal';
 import { AlertBadge } from '../components/Badges';
+import FilterToolbar, { FilterSelect } from '../components/FilterToolbar';
+import { matchSearch, uniqueValues } from '../utils/tableFilter';
+
+const ALERT_STATUSES = ['Normal', 'Warning', 'Critical'];
 
 export default function Antibiotics() {
   const [rows, setRows] = useState([]);
@@ -10,6 +14,26 @@ export default function Antibiotics() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ medicine_id: '', allowed_range_limit: 10, alert_status: 'Normal' });
+  const [search, setSearch] = useState('');
+  const [filterCompany, setFilterCompany] = useState('');
+  const [filterAlert, setFilterAlert] = useState('');
+
+  const companies = useMemo(() => uniqueValues(rows, 'company_name'), [rows]);
+
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((r) => {
+        if (filterCompany && r.company_name !== filterCompany) return false;
+        if (filterAlert && r.alert_status !== filterAlert) return false;
+        return matchSearch(r, search, [
+          'antibiotic_id',
+          'medicine_name',
+          'company_name',
+          'alert_status',
+        ]);
+      }),
+    [rows, search, filterCompany, filterAlert],
+  );
 
   async function load() {
     try {
@@ -88,8 +112,28 @@ export default function Antibiotics() {
         </button>
       </div>
       {error && <p className="error-text">{error}</p>}
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by medicine, company, ID..."
+      >
+        <FilterSelect
+          value={filterCompany}
+          onChange={setFilterCompany}
+          allLabel="All Companies"
+          options={companies.map((c) => ({ value: c, label: c }))}
+        />
+        <FilterSelect
+          value={filterAlert}
+          onChange={setFilterAlert}
+          allLabel="All Alerts"
+          options={ALERT_STATUSES.map((s) => ({ value: s, label: s }))}
+        />
+      </FilterToolbar>
       {rows.length === 0 ? (
         <div className="empty-state">No antibiotic limits configured</div>
+      ) : filteredRows.length === 0 ? (
+        <div className="empty-state">No records match your search or filters</div>
       ) : (
         <table>
           <thead>
@@ -104,7 +148,7 @@ export default function Antibiotics() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
+            {filteredRows.map((r) => (
               <tr key={r.antibiotic_id}>
                 <td>{r.antibiotic_id}</td>
                 <td>{r.medicine_name}</td>

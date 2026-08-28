@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import Modal from '../components/Modal';
 import { useAuth } from '../context/AuthContext';
+import FilterToolbar from '../components/FilterToolbar';
+import { matchSearch } from '../utils/tableFilter';
 
 const empty = { customer_name: '', contact_no: '', purchase_history: '' };
 
@@ -12,6 +14,15 @@ export default function Customers() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(empty);
+  const [search, setSearch] = useState('');
+
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((r) =>
+        matchSearch(r, search, ['customer_id', 'customer_name', 'contact_no', 'purchase_history']),
+      ),
+    [rows, search],
+  );
 
   async function load() {
     try {
@@ -77,8 +88,15 @@ export default function Customers() {
         </button>
       </div>
       {error && <p className="error-text">{error}</p>}
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by name, contact, ID..."
+      />
       {rows.length === 0 ? (
         <div className="empty-state">No customers found</div>
+      ) : filteredRows.length === 0 ? (
+        <div className="empty-state">No customers match your search</div>
       ) : (
         <table>
           <thead>
@@ -91,7 +109,7 @@ export default function Customers() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
+            {filteredRows.map((r) => (
               <tr key={r.customer_id}>
                 <td>{r.customer_id}</td>
                 <td>{r.customer_name}</td>

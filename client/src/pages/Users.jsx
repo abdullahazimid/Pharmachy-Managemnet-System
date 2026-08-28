@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import Modal from '../components/Modal';
 import { RoleBadge } from '../components/Badges';
+import FilterToolbar, { FilterSelect } from '../components/FilterToolbar';
+import { matchSearch } from '../utils/tableFilter';
 
 const empty = { name: '', role: 'Employee', username: '', email: '', password: '' };
+
+const ROLES = ['Admin', 'Pharmacist', 'Employee'];
 
 export default function Users() {
   const [rows, setRows] = useState([]);
@@ -11,6 +15,17 @@ export default function Users() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(empty);
+  const [search, setSearch] = useState('');
+  const [filterRole, setFilterRole] = useState('');
+
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((r) => {
+        if (filterRole && r.role !== filterRole) return false;
+        return matchSearch(r, search, ['user_id', 'name', 'role', 'username', 'email']);
+      }),
+    [rows, search, filterRole],
+  );
 
   async function load() {
     try {
@@ -78,8 +93,22 @@ export default function Users() {
         </button>
       </div>
       {error && <p className="error-text">{error}</p>}
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by name, username, email, ID..."
+      >
+        <FilterSelect
+          value={filterRole}
+          onChange={setFilterRole}
+          allLabel="All Roles"
+          options={ROLES.map((r) => ({ value: r, label: r }))}
+        />
+      </FilterToolbar>
       {rows.length === 0 ? (
         <div className="empty-state">No users found</div>
+      ) : filteredRows.length === 0 ? (
+        <div className="empty-state">No users match your search or filters</div>
       ) : (
         <table>
           <thead>
@@ -93,7 +122,7 @@ export default function Users() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
+            {filteredRows.map((r) => (
               <tr key={r.user_id}>
                 <td>{r.user_id}</td>
                 <td>{r.name}</td>

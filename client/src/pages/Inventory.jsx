@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import Modal from '../components/Modal';
+import FilterToolbar, { FilterSelect } from '../components/FilterToolbar';
+import { matchSearch } from '../utils/tableFilter';
 
 export default function Inventory() {
   const [rows, setRows] = useState([]);
@@ -8,6 +10,22 @@ export default function Inventory() {
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ medicine_id: '', quantity_added: 0, quantity_sold: 0 });
+  const [search, setSearch] = useState('');
+  const [filterMedicine, setFilterMedicine] = useState('');
+
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((r) => {
+        if (filterMedicine && String(r.medicine_id) !== filterMedicine) return false;
+        return matchSearch(r, search, [
+          'stock_id',
+          'medicine_name',
+          'updated_by_name',
+          'date_updated',
+        ]);
+      }),
+    [rows, search, filterMedicine],
+  );
 
   async function load() {
     try {
@@ -52,8 +70,25 @@ export default function Inventory() {
         </button>
       </div>
       {error && <p className="error-text">{error}</p>}
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by medicine, updated by, date, ID..."
+      >
+        <FilterSelect
+          value={filterMedicine}
+          onChange={setFilterMedicine}
+          allLabel="All Medicines"
+          options={medicines.map((m) => ({
+            value: String(m.medicine_id),
+            label: m.medicine_name,
+          }))}
+        />
+      </FilterToolbar>
       {rows.length === 0 ? (
         <div className="empty-state">No inventory logs yet</div>
+      ) : filteredRows.length === 0 ? (
+        <div className="empty-state">No records match your search or filters</div>
       ) : (
         <table>
           <thead>
@@ -67,7 +102,7 @@ export default function Inventory() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
+            {filteredRows.map((r) => (
               <tr key={r.stock_id}>
                 <td>{r.stock_id}</td>
                 <td>{r.medicine_name}</td>

@@ -1,11 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import { money } from '../components/Badges';
+import FilterToolbar from '../components/FilterToolbar';
+import { matchSearch } from '../utils/tableFilter';
 
 export default function Reports() {
   const [type, setType] = useState('Daily');
   const [rows, setRows] = useState([]);
   const [error, setError] = useState('');
+  const [search, setSearch] = useState('');
+
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((r) =>
+        matchSearch(r, search, ['report_type', 'report_date']),
+      ),
+    [rows, search],
+  );
 
   async function load(reportType = type) {
     try {
@@ -48,8 +59,15 @@ export default function Reports() {
       </div>
 
       {error && <p className="error-text">{error}</p>}
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by date..."
+      />
       {rows.length === 0 ? (
         <div className="empty-state">No report data yet — create some sales first</div>
+      ) : filteredRows.length === 0 ? (
+        <div className="empty-state">No reports match your search</div>
       ) : (
         <table>
           <thead>
@@ -62,7 +80,7 @@ export default function Reports() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r, i) => (
+            {filteredRows.map((r, i) => (
               <tr key={`${r.report_date}-${i}`}>
                 <td>
                   <span className={`badge ${r.report_type === 'Daily' ? 'badge-daily' : 'badge-monthly'}`}>

@@ -151,60 +151,90 @@ tr:hover {
   background-color: #f9fbfd;
 }
 
-.edit {
-  background: #FFC107;
-  color: #333;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 12px;
-  margin-right: 4px;
-}
-
-.delete {
-  background: #E53935;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 12px;
-}
-
+.edit,
+.delete,
 .view {
-  background: #0288D1;
-  color: white;
+  background: none;
   border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
+  padding: 0 6px;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 12px;
-  margin-right: 4px;
+  font-weight: normal;
+  font-size: 14px;
+  color: #444;
 }
 
 .badge {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: bold;
-  display: inline-block;
+  padding: 0;
+  border-radius: 0;
+  font-size: 14px;
+  font-weight: normal;
+  display: inline;
+  background: none;
+  color: #444;
 }
 
-.badge-admin { background: #E1BEE7; color: #4A148C; }
-.badge-pharmacist { background: #BBDEFB; color: #0D47A1; }
-.badge-employee { background: #C8E6C9; color: #1B5E20; }
-.badge-antibiotic { background: #FFCDD2; color: #B71C1C; }
-.badge-general { background: #E0E0E0; color: #424242; }
-.badge-normal { background: #C8E6C9; color: #2E7D32; }
-.badge-warning { background: #FFE082; color: #F57F17; }
-.badge-critical { background: #FFCDD2; color: #C62828; }
-.badge-cash { background: #D1C4E9; color: #311B92; }
-.badge-daily { background: #B2EBF2; color: #006064; }
-.badge-monthly { background: #DCEDC8; color: #33691E; }
+.badge-admin,
+.badge-pharmacist,
+.badge-employee,
+.badge-antibiotic,
+.badge-general,
+.badge-normal,
+.badge-warning,
+.badge-critical,
+.badge-cash,
+.badge-daily,
+.badge-monthly {
+  background: none;
+  color: #444;
+}
+
+.filter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+  background: white;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.filter-toolbar select {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  min-width: 180px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.detail-grid > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
 
 .modal-overlay {
   position: fixed;

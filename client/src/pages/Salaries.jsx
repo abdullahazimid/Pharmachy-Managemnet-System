@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import Modal from '../components/Modal';
 import { money } from '../components/Badges';
+import FilterToolbar, { FilterSelect } from '../components/FilterToolbar';
+import { matchSearch, uniqueValues } from '../utils/tableFilter';
 
 const empty = {
   employee_id: '',
@@ -18,6 +20,27 @@ export default function Salaries() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(empty);
+  const [search, setSearch] = useState('');
+  const [filterEmployee, setFilterEmployee] = useState('');
+  const [filterMonth, setFilterMonth] = useState('');
+
+  const months = useMemo(() => uniqueValues(rows, 'month'), [rows]);
+
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((r) => {
+        if (filterEmployee && String(r.employee_id) !== filterEmployee) return false;
+        if (filterMonth && r.month !== filterMonth) return false;
+        return matchSearch(r, search, [
+          'salary_id',
+          'employee_name',
+          'role',
+          'month',
+          'payment_date',
+        ]);
+      }),
+    [rows, search, filterEmployee, filterMonth],
+  );
 
   async function load() {
     try {
@@ -92,8 +115,31 @@ export default function Salaries() {
         </button>
       </div>
       {error && <p className="error-text">{error}</p>}
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by employee, month, ID..."
+      >
+        <FilterSelect
+          value={filterEmployee}
+          onChange={setFilterEmployee}
+          allLabel="All Employees"
+          options={users.map((u) => ({
+            value: String(u.user_id),
+            label: u.name,
+          }))}
+        />
+        <FilterSelect
+          value={filterMonth}
+          onChange={setFilterMonth}
+          allLabel="All Months"
+          options={months.map((m) => ({ value: m, label: m }))}
+        />
+      </FilterToolbar>
       {rows.length === 0 ? (
         <div className="empty-state">No salary records</div>
+      ) : filteredRows.length === 0 ? (
+        <div className="empty-state">No records match your search or filters</div>
       ) : (
         <table>
           <thead>
@@ -110,7 +156,7 @@ export default function Salaries() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
+            {filteredRows.map((r) => (
               <tr key={r.salary_id}>
                 <td>{r.salary_id}</td>
                 <td>{r.employee_name}</td>

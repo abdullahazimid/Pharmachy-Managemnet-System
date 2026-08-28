@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import Modal from '../components/Modal';
+import FilterToolbar, { FilterSelect } from '../components/FilterToolbar';
+import { matchSearch, uniqueValues } from '../utils/tableFilter';
 import { CategoryBadge, money } from '../components/Badges';
 
 const empty = {
@@ -22,6 +24,28 @@ export default function Medicines() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(empty);
+  const [search, setSearch] = useState('');
+  const [filterSupplier, setFilterSupplier] = useState('');
+  const [filterCompany, setFilterCompany] = useState('');
+  const [viewRow, setViewRow] = useState(null);
+
+  const companies = useMemo(() => uniqueValues(rows, 'company_name'), [rows]);
+
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((r) => {
+        if (filterSupplier && String(r.supplier_id) !== filterSupplier) return false;
+        if (filterCompany && r.company_name !== filterCompany) return false;
+        return matchSearch(r, search, [
+          'medicine_id',
+          'medicine_name',
+          'company_name',
+          'supplier_name',
+          'category',
+        ]);
+      }),
+    [rows, search, filterSupplier, filterCompany],
+  );
 
   async function load() {
     try {
@@ -101,8 +125,31 @@ export default function Medicines() {
         </button>
       </div>
       {error && <p className="error-text">{error}</p>}
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by name, company, supplier, ID..."
+      >
+        <FilterSelect
+          value={filterCompany}
+          onChange={setFilterCompany}
+          allLabel="All Companies"
+          options={companies.map((c) => ({ value: c, label: c }))}
+        />
+        <FilterSelect
+          value={filterSupplier}
+          onChange={setFilterSupplier}
+          allLabel="All Suppliers"
+          options={suppliers.map((s) => ({
+            value: String(s.supplier_id),
+            label: s.supplier_name,
+          }))}
+        />
+      </FilterToolbar>
       {rows.length === 0 ? (
         <div className="empty-state">No medicines found</div>
+      ) : filteredRows.length === 0 ? (
+        <div className="empty-state">No medicines match your search or filters</div>
       ) : (
         <table>
           <thead>
@@ -120,7 +167,7 @@ export default function Medicines() {
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
+            {filteredRows.map((r) => (
               <tr key={r.medicine_id}>
                 <td>{r.medicine_id}</td>
                 <td>{r.medicine_name}</td>
@@ -134,6 +181,9 @@ export default function Medicines() {
                 <td>{r.expiry_date}</td>
                 <td>{r.supplier_name || '-'}</td>
                 <td>
+                  <button type="button" className="view" onClick={() => setViewRow(r)}>
+                    View
+                  </button>
                   <button type="button" className="edit" onClick={() => openEdit(r)}>
                     Edit
                   </button>
@@ -145,6 +195,64 @@ export default function Medicines() {
             ))}
           </tbody>
         </table>
+      )}
+
+      {viewRow && (
+        <Modal title="Medicine Details" onClose={() => setViewRow(null)} wide>
+          <div className="detail-grid">
+            <div>
+              <span className="detail-label">ID</span>
+              <span>{viewRow.medicine_id}</span>
+            </div>
+            <div>
+              <span className="detail-label">Medicine Name</span>
+              <span>{viewRow.medicine_name}</span>
+            </div>
+            <div>
+              <span className="detail-label">Company</span>
+              <span>{viewRow.company_name}</span>
+            </div>
+            <div>
+              <span className="detail-label">Category</span>
+              <span>
+                <CategoryBadge category={viewRow.category} />
+              </span>
+            </div>
+            <div>
+              <span className="detail-label">Sell Price</span>
+              <span>{money(viewRow.unit_price)}</span>
+            </div>
+            <div>
+              <span className="detail-label">Purchase Price</span>
+              <span>{money(viewRow.purchase_price)}</span>
+            </div>
+            <div>
+              <span className="detail-label">Stock</span>
+              <span>{viewRow.quantity_in_stock}</span>
+            </div>
+            <div>
+              <span className="detail-label">Manufacture Date</span>
+              <span>{viewRow.manufacture_date}</span>
+            </div>
+            <div>
+              <span className="detail-label">Expiry Date</span>
+              <span>{viewRow.expiry_date}</span>
+            </div>
+            <div>
+              <span className="detail-label">Supplier</span>
+              <span>{viewRow.supplier_name || '-'}</span>
+            </div>
+            <div>
+              <span className="detail-label">Added On</span>
+              <span>{viewRow.created_at ? new Date(viewRow.created_at).toLocaleString() : '-'}</span>
+            </div>
+          </div>
+          <div className="form-actions">
+            <button type="button" className="cancel-btn" onClick={() => setViewRow(null)}>
+              Close
+            </button>
+          </div>
+        </Modal>
       )}
 
       {open && (

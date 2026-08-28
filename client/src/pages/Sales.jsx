@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import Modal from '../components/Modal';
 import { money } from '../components/Badges';
+import FilterToolbar, { FilterSelect } from '../components/FilterToolbar';
+import { matchSearch } from '../utils/tableFilter';
+
+const PAYMENT_METHODS = ['Cash', 'Card', 'bKash'];
 
 export default function Sales() {
   const navigate = useNavigate();
@@ -11,6 +15,8 @@ export default function Sales() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [filterPayment, setFilterPayment] = useState('');
   const [form, setForm] = useState({
     customer_name: '',
     customer_contact: '',
@@ -41,6 +47,22 @@ export default function Sales() {
     const disc = (sub * Number(form.discount_percentage || 0)) / 100;
     return { sub, disc, total: sub - disc };
   }, [cart, form.discount_percentage]);
+
+  const filteredSales = useMemo(
+    () =>
+      sales.filter((r) => {
+        if (filterPayment && r.payment_method !== filterPayment) return false;
+        return matchSearch(r, search, [
+          'sales_id',
+          'medicine_name',
+          'payment_method',
+          'sold_by_name',
+          'invoice_id',
+          'sale_date',
+        ]);
+      }),
+    [sales, search, filterPayment],
+  );
 
   function addToCart() {
     const med = medicines.find((m) => String(m.medicine_id) === String(form.medicine_id));
@@ -134,8 +156,22 @@ export default function Sales() {
       </div>
       {error && <p className="error-text">{error}</p>}
       {success && <p className="success-text">{success}</p>}
+      <FilterToolbar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by medicine, invoice, sold by, ID..."
+      >
+        <FilterSelect
+          value={filterPayment}
+          onChange={setFilterPayment}
+          allLabel="All Payment Methods"
+          options={PAYMENT_METHODS.map((p) => ({ value: p, label: p }))}
+        />
+      </FilterToolbar>
       {sales.length === 0 ? (
         <div className="empty-state">No sales yet</div>
+      ) : filteredSales.length === 0 ? (
+        <div className="empty-state">No sales match your search or filters</div>
       ) : (
         <table>
           <thead>
@@ -152,7 +188,7 @@ export default function Sales() {
             </tr>
           </thead>
           <tbody>
-            {sales.map((r) => (
+            {filteredSales.map((r) => (
               <tr key={r.sales_id}>
                 <td>{r.sales_id}</td>
                 <td>{r.medicine_name}</td>
