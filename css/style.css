@@ -6,135 +6,381 @@
 }
 
 body {
-
-    background: #f4f7fb;
-
     display: flex;
-
-    justify-content: center;
-
-    align-items: center;
-
-    height: 100vh;
-
+    background: #f4f6f9;
+    min-height: 100vh;
 }
 
-.container {
-
-    width: 100%;
-
+body.login-page {
     display: flex;
-
     justify-content: center;
-
     align-items: center;
-
+    background: #f4f7fb;
 }
 
 .login-card {
-
     width: 400px;
-
     background: white;
-
     padding: 40px;
-
     border-radius: 12px;
-
-    box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
-
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 .login-card h1 {
-
     text-align: center;
-
     color: #1565C0;
-
     margin-bottom: 10px;
-
 }
 
-.subtitle {
-
+.login-card p {
     text-align: center;
-
     color: #777;
-
-    margin-bottom: 30px;
-
+    margin-bottom: 24px;
 }
 
-.input-group {
-
-    margin-bottom: 20px;
-
-}
-
-.input-group label {
-
+.login-card label {
     display: block;
-
-    margin-bottom: 8px;
-
+    margin-bottom: 6px;
     font-weight: bold;
-
 }
 
-.input-group input {
-
+.login-card input[type="text"],
+.login-card input[type="password"] {
     width: 100%;
-
     padding: 12px;
-
     border: 1px solid #ccc;
-
     border-radius: 6px;
-
-    outline: none;
-
+    margin-bottom: 16px;
     font-size: 15px;
-
 }
 
-.input-group input:focus {
-
-    border-color: #1565C0;
-
-}
-
-button {
-
+.login-card button {
     width: 100%;
-
     padding: 14px;
-
     background: #1565C0;
-
     color: white;
-
     border: none;
-
     border-radius: 6px;
-
     font-size: 16px;
-
     cursor: pointer;
-
 }
 
-button:hover {
-
+.login-card button:hover {
     background: #0D47A1;
-
 }
 
-#message {
+.sidebar {
+    width: 250px;
+    background: #1565C0;
+    color: white;
+    min-height: 100vh;
+    padding: 20px 15px;
+    flex-shrink: 0;
+}
 
-    margin-top: 20px;
-
+.sidebar h2 {
     text-align: center;
+    margin-bottom: 30px;
+    font-size: 22px;
+}
 
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar li {
+    margin-bottom: 8px;
+    border-radius: 6px;
+}
+
+.sidebar li a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.sidebar li:hover,
+.sidebar li.active {
+    background: #0D47A1;
+}
+
+.main {
+    flex: 1;
+    padding: 30px;
+    overflow-x: auto;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    background: white;
+    padding: 20px 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.topbar h1 {
+    font-size: 24px;
+    color: #333;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
+}
+
+.card h2 {
+    font-size: 18px;
+    color: #1565C0;
+    margin-bottom: 16px;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 12px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 1;
+    min-width: 180px;
+}
+
+.form-group label {
+    font-size: 14px;
     font-weight: bold;
+    color: #333;
+}
 
+.form-group input,
+.form-group select,
+.form-group textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.save-btn,
+.add-btn {
+    background: #1565C0;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.save-btn:hover,
+.add-btn:hover {
+    background: #0D47A1;
+}
+
+.cancel-btn {
+    background: #757575;
+    color: white;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.search-box {
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 260px;
+    margin-bottom: 12px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+th {
+    background: #1565C0;
+    color: white;
+    padding: 14px 16px;
+    text-align: center;
+    font-size: 14px;
+}
+
+td {
+    padding: 14px 16px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+    font-size: 14px;
+    color: #444;
+}
+
+.edit {
+    background: #FFC107;
+    color: #333;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    margin-right: 4px;
+    display: inline-block;
+}
+
+.delete {
+    background: #E53935;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.view {
+    background: #0288D1;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.msg-ok {
+    background: #C8E6C9;
+    color: #1B5E20;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.msg-err {
+    background: #FFCDD2;
+    color: #B71C1C;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.card-stat {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    min-width: 150px;
+    flex: 1;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.card-stat h3 {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.card-stat p {
+    font-size: 26px;
+    color: #1565C0;
+    font-weight: bold;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.badge-admin { background: #E1BEE7; color: #4A148C; }
+.badge-pharmacist { background: #BBDEFB; color: #0D47A1; }
+.badge-employee { background: #C8E6C9; color: #1B5E20; }
+.badge-antibiotic { background: #FFCDD2; color: #B71C1C; }
+.badge-general { background: #E0E0E0; color: #424242; }
+.badge-normal { background: #C8E6C9; color: #2E7D32; }
+.badge-warning { background: #FFE082; color: #F57F17; }
+.badge-critical { background: #FFCDD2; color: #C62828; }
+
+.tabs a {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 8px 14px;
+    background: #e0e0e0;
+    color: #333;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.tabs a.active {
+    background: #1565C0;
+    color: white;
+}
+
+.receipt {
+    max-width: 700px;
+    margin: 30px auto;
+    background: white;
+    padding: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.receipt h1 {
+    color: #1565C0;
+    text-align: center;
+}
+
+.receipt p {
+    margin: 6px 0;
+}
+
+@media print {
+    .no-print {
+        display: none;
+    }
+    body {
+        display: block;
+        background: white;
+    }
+    .receipt {
+        box-shadow: none;
+        margin: 0;
+    }
 }

@@ -138,11 +138,11 @@ CREATE TABLE `invoices` (
     CONSTRAINT `fk_invoice_user` FOREIGN KEY (`generated_by`) REFERENCES `users`(`user_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Seed Users (passwords: admin123, pharma123, emp123 — bcrypt hashed)
+-- Seed Users (passwords: admin123, pharma123, emp123)
 INSERT INTO `users` (`user_id`, `name`, `role`, `username`, `password`, `email`) VALUES
-(1, 'Admin User', 'Admin', 'admin', '$2b$10$RKRd8bYS/1ahKwwo903NK.E/5KuRcQgizORAti92.F7pD72HN.nJ.', 'admin@khanpharmacy.com'),
-(2, 'Dr. Rafiq Islam', 'Pharmacist', 'rafiq', '$2b$10$NmyTbzrOwX8cmspaguV0quiIXZ4ErSeFESgPJbzc1eFIF9rfV2bmC', 'rafiq@khanpharmacy.com'),
-(3, 'Tariq Hassan', 'Employee', 'tariq', '$2b$10$A/jl711aOoEnkxBxXBZhtubOnHWo8.4QCWHhi4XdB2IBtknXMViuO', 'tariq@khanpharmacy.com');
+(1, 'Admin User', 'Admin', 'admin', '$2y$10$Tepe3xcCWtH0HFCY38LTIOe4k2/KtU9DMvscn1gXsFEc0Vv7yRLHO', 'admin@khanpharmacy.com'),
+(2, 'Dr. Rafiq Islam', 'Pharmacist', 'rafiq', '$2y$10$gvAxFVJvIFfRBw8LBvc60eKVjBxS2GL9SWMkN3Eqzt/jb12ttz6bq', 'rafiq@khanpharmacy.com'),
+(3, 'Tariq Hassan', 'Employee', 'tariq', '$2y$10$Ca574M2jm2/OZi8//7ExBOdXtIndmDyVYAKZ2OA3CcvaeXqIa3ZOy', 'tariq@khanpharmacy.com');
 
 -- Seed Suppliers
 INSERT INTO `suppliers` (`supplier_id`, `supplier_name`, `contact_no`, `address`, `company_name`) VALUES

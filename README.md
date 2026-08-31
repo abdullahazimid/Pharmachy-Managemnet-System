@@ -1,75 +1,140 @@
-# Khan Pharmacy Automation System
+# Khan Pharmacy Management System
 
-Beginner-friendly pharmacy management app built with **React + Node.js + MySQL**.
+Beginner-friendly pharmacy app built with **HTML, CSS, JavaScript, PHP and MySQL**. No framework. Run it with XAMPP.
+
+You do **not** need Node.js, npm, Composer, or Laravel.
 
 ## Features
 
-- Role-based login: **Admin**, **Pharmacist**, **Employee**
+- Role-based login: Admin, Pharmacist, Employee
 - Medicines, suppliers, inventory, antibiotic limits
-- Sales billing with stock decrease + invoice
+- Sales billing with stock decrease and invoice print
 - Low-stock and expiry alerts
-- Salaries (Admin) and Daily/Monthly sales & P&L reports
+- Salaries (Admin) and Daily / Monthly sales and P&L reports
 
-## Requirements
+## What you need
 
-- Node.js 18+
-- MySQL (XAMPP / MySQL Server)
-- npm
+1. **Git** — [https://git-scm.com/downloads](https://git-scm.com/downloads)
+2. **XAMPP** — [https://www.apachefriends.org/](https://www.apachefriends.org/) (Apache + MySQL + PHP + phpMyAdmin)
 
-## 1. Database setup
+After installing XAMPP, open **XAMPP Control Panel** and Start **Apache** and **MySQL**. Both should show green.
 
-1. Start MySQL (XAMPP Control Panel → Start MySQL).
-2. Open phpMyAdmin or MySQL CLI and import:
+## Clone from GitHub
+
+Open **Command Prompt** or **Git Bash**, then run:
 
 ```bash
-mysql -u root < database/pharmacy.sql
+cd C:\xampp\htdocs
+git clone https://github.com/abdullahazimid/Pharmachy-Managemnet-System.git pharmacy
 ```
 
-Or in phpMyAdmin: Import → select `database/pharmacy.sql`.
+This downloads the project into `C:\xampp\htdocs\pharmacy`.
 
-This creates database `pharmacy_db` with seed data.
-
-## 2. Backend
+If the folder already exists, either delete it first or clone with another name:
 
 ```bash
-cd server
+cd C:\xampp\htdocs
+git clone https://github.com/abdullahazimid/Pharmachy-Managemnet-System.git
+```
+
+Then the URL will be `http://localhost/Pharmachy-Managemnet-System/`.
+
+**No other install command is needed.** Do not run `npm install`.
+
+## Database setup
+
+1. Make sure **MySQL** is running in XAMPP
+2. Open phpMyAdmin: [http://localhost/phpmyadmin](http://localhost/phpmyadmin)
+3. Click **Import**
+4. Choose file: `C:\xampp\htdocs\pharmacy\database\pharmacy.sql`
+5. Click **Go**
+
+This creates database `pharmacy_db` with sample users, medicines, and sales.
+
+If your MySQL `root` password is not empty, open `includes/db.php` and change:
+
+```php
+$pass = "";
+```
+
+to your password.
+
+## Run the app
+
+Open a browser:
+
+**http://localhost/pharmacy/**
+
+If you cloned with the original folder name, use:
+
+**http://localhost/Pharmachy-Managemnet-System/**
+
+You should see the login page.
+
+## Demo logins (use these to check)
+
+| Role        | Username | Password  |
+|-------------|----------|-----------|
+| Admin       | admin    | admin123  |
+| Pharmacist  | rafiq    | pharma123 |
+| Employee    | tariq    | emp123    |
+
+Wrong password should show an error and stay on login.
+
+## How to check it works
+
+### 1. Admin (`admin` / `admin123`)
+
+- Dashboard shows counts and low-stock / expiry lists
+- Sidebar has Users, Medicines, Suppliers, Antibiotics, Inventory, Sales, Reports, Salaries, Invoices, Customers
+- Open **Users** — add / edit works; you cannot delete your own account
+- Open **Sales** — add a customer name, pick a medicine, click **Add item**, then **Complete sale**
+- After sale, stock goes down and an invoice print page opens
+- Open **Reports** — Daily and Monthly totals appear from real sales
+
+### 2. Pharmacist (`rafiq` / `pharma123`)
+
+- Can open Medicines, Inventory, Antibiotics, Sales, Reports
+- Cannot open **Users** or **Salaries** (redirects to Dashboard)
+
+### 3. Employee (`tariq` / `emp123`)
+
+- Can open Dashboard, Sales, Invoices, Customers
+- Cannot open Medicines, Inventory, Users, Salaries, Reports
+
+### 4. Billing rules
+
+- Selling more than current stock is blocked
+- Antibiotic over the allowed limit per sale is blocked
+- **Logout** in the sidebar ends the session and goes back to login
+
+## Commands you need (and do not need)
+
+| Task | Command / action |
+|------|------------------|
+| Clone | `git clone https://github.com/abdullahazimid/Pharmachy-Managemnet-System.git pharmacy` |
+| Go to folder | `cd C:\xampp\htdocs\pharmacy` |
+| Pull latest | `git pull` |
+| Start app | XAMPP → Start Apache + MySQL (no terminal command) |
+| Database | phpMyAdmin → Import `database/pharmacy.sql` |
+| Open | Browser → `http://localhost/pharmacy/` |
+
+Do **not** run:
+
+```bash
 npm install
 npm start
+composer install
 ```
 
-API runs at `http://localhost:5000`.
+Those are for other stacks. This project is only PHP + MySQL.
 
-Edit `server/.env` if your MySQL password is not empty:
+## If something goes wrong
 
-```
-DB_PASSWORD=your_password
-```
-
-## 3. Frontend
-
-```bash
-cd client
-npm install
-npm run dev
-```
-
-Open `http://localhost:5173`.
-
-## Demo logins
-
-| Role        | Username | Password   |
-|-------------|----------|------------|
-| Admin       | admin    | admin123   |
-| Pharmacist  | rafiq    | pharma123  |
-| Employee    | tariq    | emp123     |
-
-## Project structure
-
-```
-client/     React (Vite) UI
-server/     Express REST API
-database/   MySQL schema + seed
-```
+- **Blank page / 404** — Apache is not started, or the folder is not inside `C:\xampp\htdocs`
+- **Database connection failed** — MySQL is not started, or `includes/db.php` password is wrong, or `pharmacy.sql` was not imported
+- **Cannot log in with demo users** — import `database/pharmacy.sql` again (it recreates `pharmacy_db`)
+- **Port 80 busy** — close Skype / other apps using port 80, or in XAMPP change Apache to port 8080 and open `http://localhost:8080/pharmacy/`
 
 ## Role access
 
@@ -82,3 +147,13 @@ database/   MySQL schema + seed
 | Reports             |  yes  |    yes     |    -     |
 | Sales / Invoices    |  yes  |    yes     |   yes    |
 | Customers           |  yes  |    yes     |   yes    |
+
+## Project structure
+
+```
+includes/   db.php, auth.php, header.php, footer.php
+css/        style.css
+js/         app.js, sales.js
+*.php       one page per module
+database/   pharmacy.sql
+```
