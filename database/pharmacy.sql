@@ -35,7 +35,7 @@ CREATE TABLE `medicines` (
     `medicine_id` INT AUTO_INCREMENT PRIMARY KEY,
     `medicine_name` VARCHAR(100) NOT NULL,
     `company_name` VARCHAR(100) NOT NULL,
-    `category` VARCHAR(50) NOT NULL DEFAULT 'General',
+    `category` VARCHAR(50) NOT NULL DEFAULT 'Medicine',
     `purchase_price` DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
     `expire_date` DATE NOT NULL,
     `manufacture_date` DATE NOT NULL,
@@ -100,14 +100,14 @@ INSERT INTO `suppliers` (`supplier_id`, `supplier_name`, `contact_number`, `comp
 
 -- Seed Medicines
 INSERT INTO `medicines` (`medicine_id`, `medicine_name`, `company_name`, `category`, `purchase_price`, `expire_date`, `manufacture_date`, `supplier_id`, `sale_price`, `batch_number`) VALUES
-(1, 'Napa Extra', 'Beximco', 'General', 6.00, '2027-10-15', '2024-10-15', 1, 10.00, 'BX-NP-2024-001'),
-(2, 'Seclo 20mg', 'Square', 'General', 7.00, '2028-01-10', '2025-01-10', 2, 12.00, 'SQ-SC-2025-002'),
-(3, 'Sergel 20mg', 'Healthcare', 'General', 9.00, '2028-05-20', '2025-05-20', 4, 15.00, 'HC-SG-2025-003'),
-(4, 'Ciprocin 500mg', 'Square', 'Antibiotic', 15.00, '2028-06-14', '2025-06-14', 2, 25.00, 'SQ-CP-2025-004'),
-(5, 'Azithrocin 500mg', 'Beximco', 'Antibiotic', 21.00, '2027-11-30', '2024-11-30', 1, 35.00, 'BX-AZ-2024-005'),
-(6, 'Fexo 120mg', 'Incepta', 'General', 5.00, '2027-03-18', '2024-03-18', 3, 9.00, 'IN-FX-2024-006'),
-(7, 'Moxaclav 625mg', 'Incepta', 'Antibiotic', 24.00, '2027-08-22', '2024-08-22', 3, 40.00, 'IN-MX-2024-007'),
-(8, 'Entacyd', 'Square', 'General', 50.00, '2026-12-01', '2023-12-01', 2, 85.00, 'SQ-EN-2023-008');
+(1, 'Napa Extra', 'Beximco', 'Medicine', 6.00, '2027-10-15', '2024-10-15', 1, 10.00, 'BX-NP-2024-001'),
+(2, 'Seclo 20mg', 'Square', 'Medicine', 7.00, '2028-01-10', '2025-01-10', 2, 12.00, 'SQ-SC-2025-002'),
+(3, 'Sergel 20mg', 'Healthcare', 'Medicine', 9.00, '2028-05-20', '2025-05-20', 4, 15.00, 'HC-SG-2025-003'),
+(4, 'Ciprocin 500mg', 'Square', 'Antibiotics', 15.00, '2028-06-14', '2025-06-14', 2, 25.00, 'SQ-CP-2025-004'),
+(5, 'Azithrocin 500mg', 'Beximco', 'Antibiotics', 21.00, '2027-11-30', '2024-11-30', 1, 35.00, 'BX-AZ-2024-005'),
+(6, 'Fexo 120mg', 'Incepta', 'Medicine', 5.00, '2027-03-18', '2024-03-18', 3, 9.00, 'IN-FX-2024-006'),
+(7, 'Moxaclav 625mg', 'Incepta', 'Antibiotics', 24.00, '2027-08-22', '2024-08-22', 3, 40.00, 'IN-MX-2024-007'),
+(8, 'Entacyd', 'Square', 'Medicine', 50.00, '2026-12-01', '2023-12-01', 2, 85.00, 'SQ-EN-2023-008');
 
 -- Seed Inventory
 INSERT INTO `inventory` (`inventory_id`, `medicine_id`, `current_stock`, `stock_status`, `updated_by`) VALUES

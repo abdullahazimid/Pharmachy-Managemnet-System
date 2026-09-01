@@ -39,3 +39,19 @@ function alert_status_for_stock($qty)
     }
     return "Normal";
 }
+
+function medicine_category_label($category)
+{
+    if ($category === "General") {
+        return "Medicine";
+    }
+    if ($category === "Antibiotic") {
+        return "Antibiotics";
+    }
+    return $category;
+}
+
+function medicine_badge_class($category)
+{
+    return strtolower(medicine_category_label($category));
+}

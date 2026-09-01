@@ -25,11 +25,13 @@ function addSaleRow() {
 
     var price = parseFloat(opt.getAttribute("data-price"));
     var name = opt.getAttribute("data-name");
+    var category = opt.getAttribute("data-category");
     var tr = document.createElement("tr");
     tr.innerHTML =
         "<td>" + name +
         '<input type="hidden" name="medicine_id[]" value="' + id + '">' +
         '<input type="hidden" name="quantity[]" value="' + qty + '"></td>' +
+        "<td>" + category + "</td>" +
         "<td>" + qty + "</td>" +
         "<td>" + price.toFixed(2) + "</td>" +
         '<td class="line-total">' + (price * qty).toFixed(2) + "</td>" +

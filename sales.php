@@ -96,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 $medicines = $conn->query(
-    "SELECT m.medicine_id, m.medicine_name, m.sale_price, COALESCE(i.current_stock, 0) AS current_stock
+    "SELECT m.medicine_id, m.medicine_name, m.category, m.sale_price, COALESCE(i.current_stock, 0) AS current_stock
      FROM medicines m
      LEFT JOIN inventory i ON m.medicine_id = i.medicine_id
      WHERE COALESCE(i.current_stock, 0) > 0
@@ -104,7 +104,7 @@ $medicines = $conn->query(
 )->fetch_all(MYSQLI_ASSOC);
 
 $sales = $conn->query(
-    "SELECT s.*, m.medicine_name, u.username AS sold_by_name
+    "SELECT s.*, m.medicine_name, m.category, u.username AS sold_by_name
      FROM sales s
      JOIN medicines m ON s.medicine_id = m.medicine_id
      LEFT JOIN users u ON s.sold_by = u.user_id
@@ -136,14 +136,17 @@ require_once "includes/header.php";
                 <label>Medicine</label>
                 <select id="med-select">
                     <option value="">Select</option>
-                    <?php foreach ($medicines as $m) { ?>
+                    <?php foreach ($medicines as $m) {
+                        $category_label = medicine_category_label($m["category"]);
+                    ?>
                     <option
                         value="<?php echo (int) $m["medicine_id"]; ?>"
                         data-name="<?php echo h($m["medicine_name"]); ?>"
+                        data-category="<?php echo h($category_label); ?>"
                         data-price="<?php echo h($m["sale_price"]); ?>"
                         data-stock="<?php echo (int) $m["current_stock"]; ?>"
                     >
-                        <?php echo h($m["medicine_name"]); ?> (<?php echo (int) $m["current_stock"]; ?> left)
+                        <?php echo h($m["medicine_name"]); ?> — <?php echo h($category_label); ?> (<?php echo (int) $m["current_stock"]; ?> left)
                     </option>
                     <?php } ?>
                 </select>
@@ -162,6 +165,7 @@ require_once "includes/header.php";
             <thead>
                 <tr>
                     <th>Medicine</th>
+                    <th>Category</th>
                     <th>Qty</th>
                     <th>Unit price</th>
                     <th>Line total</th>
@@ -183,6 +187,7 @@ require_once "includes/header.php";
         <tr>
             <th>ID</th>
             <th>Medicine</th>
+            <th>Category</th>
             <th>Qty</th>
             <th>Unit price</th>
             <th>Total</th>
@@ -196,6 +201,7 @@ require_once "includes/header.php";
         <tr>
             <td><?php echo (int) $row["sale_id"]; ?></td>
             <td><?php echo h($row["medicine_name"]); ?></td>
+            <td><?php echo h(medicine_category_label($row["category"])); ?></td>
             <td><?php echo (int) $row["quantity_sold"]; ?></td>
             <td><?php echo number_format((float) $row["unit_price"], 2); ?></td>
             <td><?php echo number_format((float) $row["total_amount"], 2); ?></td>

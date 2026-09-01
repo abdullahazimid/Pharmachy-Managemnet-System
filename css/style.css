@@ -337,8 +337,10 @@ td {
 .badge-admin { background: transparent; color: #4A148C; border: 1px solid #4A148C; }
 .badge-pharmacist { background: transparent; color: #0D47A1; border: 1px solid #0D47A1; }
 .badge-employee { background: transparent; color: #1B5E20; border: 1px solid #1B5E20; }
-.badge-antibiotic { background: transparent; color: #B71C1C; border: 1px solid #B71C1C; }
+.badge-medicine { background: transparent; color: #424242; border: 1px solid #424242; }
+.badge-antibiotics { background: transparent; color: #B71C1C; border: 1px solid #B71C1C; }
 .badge-general { background: transparent; color: #424242; border: 1px solid #424242; }
+.badge-antibiotic { background: transparent; color: #B71C1C; border: 1px solid #B71C1C; }
 .badge-normal { background: transparent; color: #2E7D32; border: 1px solid #2E7D32; }
 .badge-warning { background: transparent; color: #F57F17; border: 1px solid #F57F17; }
 .badge-critical { background: transparent; color: #C62828; border: 1px solid #C62828; }

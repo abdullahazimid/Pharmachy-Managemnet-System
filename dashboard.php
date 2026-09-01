@@ -111,7 +111,7 @@ require_once "includes/header.php";
                 <td><?php echo (int) $row["medicine_id"]; ?></td>
                 <td><?php echo h($row["medicine_name"]); ?></td>
                 <td><?php echo (int) $row["current_stock"]; ?></td>
-                <td><?php echo h($row["category"]); ?></td>
+                <td><?php echo h(medicine_category_label($row["category"])); ?></td>
                 <td><?php echo h($row["stock_status"]); ?></td>
                 <td><?php echo h($row["expire_date"]); ?></td>
             </tr>
@@ -142,7 +142,7 @@ require_once "includes/header.php";
                 <td><?php echo (int) $row["medicine_id"]; ?></td>
                 <td><?php echo h($row["medicine_name"]); ?></td>
                 <td><?php echo (int) $row["current_stock"]; ?></td>
-                <td><?php echo h($row["category"]); ?></td>
+                <td><?php echo h(medicine_category_label($row["category"])); ?></td>
                 <td><?php echo h($row["expire_date"]); ?></td>
             </tr>
             <?php } ?>

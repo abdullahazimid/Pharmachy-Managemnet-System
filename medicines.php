@@ -32,18 +32,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($action === "add" || $action === "edit") {
         $medicine_name = trim($_POST["medicine_name"] ?? "");
         $company_name = trim($_POST["company_name"] ?? "");
-        $category = trim($_POST["category"] ?? "General");
+        $category = trim($_POST["category"] ?? "Medicine");
         $sale_price = (float) ($_POST["sale_price"] ?? 0);
         $purchase_price = (float) ($_POST["purchase_price"] ?? 0);
         $expire_date = $_POST["expire_date"] ?? "";
         $manufacture_date = $_POST["manufacture_date"] ?? "";
         $batch_number = trim($_POST["batch_number"] ?? "");
         $supplier_id = $_POST["supplier_id"] !== "" ? (int) $_POST["supplier_id"] : 0;
+        $quantity = (int) ($_POST["quantity"] ?? 0);
         $id = (int) ($_POST["id"] ?? 0);
         $user_id = (int) $_SESSION["user_id"];
+        $categories = ["Medicine", "Antibiotics"];
 
         if ($medicine_name === "" || $company_name === "" || $sale_price <= 0 || $expire_date === "" || $manufacture_date === "") {
             $error = "Name, company, sale price and dates are required.";
+        } elseif (!in_array($category, $categories, true)) {
+            $error = "Category must be Medicine or Antibiotics.";
+        } elseif ($action === "add" && $quantity < 0) {
+            $error = "Quantity cannot be negative.";
         } else {
             if ($action === "add") {
                 $stmt = $conn->prepare(
@@ -66,9 +72,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $new_id = $stmt->insert_id;
                 $stmt->close();
 
-                $status = alert_status_for_stock(0);
-                $inv = $conn->prepare("INSERT INTO inventory (medicine_id, current_stock, stock_status, updated_by) VALUES (?, 0, ?, ?)");
-                $inv->bind_param("isi", $new_id, $status, $user_id);
+                $status = alert_status_for_stock($quantity);
+                $inv = $conn->prepare("INSERT INTO inventory (medicine_id, current_stock, stock_status, updated_by) VALUES (?, ?, ?, ?)");
+                $inv->bind_param("iisi", $new_id, $quantity, $status, $user_id);
                 $inv->execute();
                 $inv->close();
             } else {
@@ -118,6 +124,8 @@ $rows = $conn->query(
 )->fetch_all(MYSQLI_ASSOC);
 
 require_once "includes/header.php";
+
+$edit_category = medicine_category_label($edit["category"] ?? "Medicine");
 ?>
 
 <?php if ($msg !== "") { ?><div class="msg-ok"><?php echo h($msg); ?></div><?php } ?>
@@ -140,10 +148,16 @@ require_once "includes/header.php";
             <div class="form-group">
                 <label>Category</label>
                 <select name="category">
-                    <option value="General" <?php echo ($edit["category"] ?? "") === "General" ? "selected" : ""; ?>>General</option>
-                    <option value="Antibiotic" <?php echo ($edit["category"] ?? "") === "Antibiotic" ? "selected" : ""; ?>>Antibiotic</option>
+                    <option value="Medicine" <?php echo $edit_category === "Medicine" ? "selected" : ""; ?>>Medicine</option>
+                    <option value="Antibiotics" <?php echo $edit_category === "Antibiotics" ? "selected" : ""; ?>>Antibiotics</option>
                 </select>
             </div>
+            <?php if (!$edit) { ?>
+            <div class="form-group">
+                <label>Quantity</label>
+                <input type="number" name="quantity" min="0" required value="0">
+            </div>
+            <?php } ?>
             <div class="form-group">
                 <label>Batch number</label>
                 <input type="text" name="batch_number" value="<?php echo h($edit["batch_number"] ?? ""); ?>">
@@ -209,7 +223,7 @@ require_once "includes/header.php";
             <td><?php echo h($row["medicine_name"]); ?></td>
             <td><?php echo h($row["company_name"]); ?></td>
             <td>
-                <span class="badge badge-<?php echo strtolower($row["category"]); ?>"><?php echo h($row["category"]); ?></span>
+                <span class="badge badge-<?php echo h(medicine_badge_class($row["category"])); ?>"><?php echo h(medicine_category_label($row["category"])); ?></span>
             </td>
             <td><?php echo h($row["batch_number"]); ?></td>
             <td><?php echo number_format((float) $row["sale_price"], 2); ?></td>

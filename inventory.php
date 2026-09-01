@@ -79,7 +79,7 @@ require_once "includes/header.php";
                     <option value="">Select</option>
                     <?php foreach ($rows as $m) { ?>
                     <option value="<?php echo (int) $m["medicine_id"]; ?>">
-                        <?php echo h($m["medicine_name"]); ?> (<?php echo (int) $m["current_stock"]; ?> in stock)
+                        <?php echo h($m["medicine_name"]); ?> — <?php echo h(medicine_category_label($m["category"])); ?> (<?php echo (int) $m["current_stock"]; ?> in stock)
                     </option>
                     <?php } ?>
                 </select>
@@ -114,7 +114,7 @@ require_once "includes/header.php";
         <tr>
             <td><?php echo (int) $row["inventory_id"]; ?></td>
             <td><?php echo h($row["medicine_name"]); ?></td>
-            <td><?php echo h($row["category"]); ?></td>
+            <td><?php echo h(medicine_category_label($row["category"])); ?></td>
             <td><?php echo (int) $row["current_stock"]; ?></td>
             <td><span class="badge badge-<?php echo strtolower($row["stock_status"]); ?>"><?php echo h($row["stock_status"]); ?></span></td>
             <td><?php echo h($row["expire_date"]); ?></td>
