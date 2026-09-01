@@ -80,19 +80,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     break;
                 }
 
-                if ($med["category"] === "Antibiotic") {
-                    $ab = $conn->prepare("SELECT allowed_range_limit FROM antibiotic_list WHERE medicine_id = ?");
-                    $ab->bind_param("i", $mid);
-                    $ab->execute();
-                    $limit_row = $ab->get_result()->fetch_assoc();
-                    $ab->close();
-                    if ($limit_row && $qty > (int) $limit_row["allowed_range_limit"]) {
-                        $ok = false;
-                        $error = $med["medicine_name"] . " antibiotic limit is " . $limit_row["allowed_range_limit"] . " per sale.";
-                        break;
-                    }
-                }
-
                 $line = (float) $med["unit_price"] * $qty;
                 $subtotal += $line;
                 $details[] = [

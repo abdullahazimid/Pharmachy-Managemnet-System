@@ -11,7 +11,6 @@ $medicines = $conn->query("SELECT COUNT(*) AS c FROM medicines")->fetch_assoc()[
 $stock = $conn->query("SELECT COALESCE(SUM(quantity_in_stock), 0) AS c FROM medicines")->fetch_assoc()["c"];
 $sales = $conn->query("SELECT COALESCE(SUM(total_price), 0) AS c FROM sales_transactions")->fetch_assoc()["c"];
 $invoices = $conn->query("SELECT COUNT(*) AS c FROM invoices")->fetch_assoc()["c"];
-$customers = $conn->query("SELECT COUNT(*) AS c FROM customers")->fetch_assoc()["c"];
 
 $profit = 0;
 $low_stock = [];
@@ -73,10 +72,6 @@ require_once "includes/header.php";
     <div class="card-stat">
         <h3>Invoices</h3>
         <p><?php echo (int) $invoices; ?></p>
-    </div>
-    <div class="card-stat">
-        <h3>Customers</h3>
-        <p><?php echo (int) $customers; ?></p>
     </div>
     <?php if ($role === "Admin" || $role === "Pharmacist") { ?>
     <div class="card-stat">

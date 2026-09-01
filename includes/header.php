@@ -55,9 +55,6 @@ $current_page = basename($_SERVER["PHP_SELF"]);
         <li class="<?php echo $current_page === "invoices.php" || $current_page === "invoice_print.php" ? "active" : ""; ?>">
             <a href="invoices.php">Invoices</a>
         </li>
-        <li class="<?php echo $current_page === "customers.php" ? "active" : ""; ?>">
-            <a href="customers.php">Customers</a>
-        </li>
         <li>
             <a href="logout.php">Logout (<?php echo h($_SESSION["name"]); ?>)</a>
         </li>
