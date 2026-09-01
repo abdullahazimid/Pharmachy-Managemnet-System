@@ -56,7 +56,7 @@ if ($type === "Daily") {
 require_once "includes/header.php";
 ?>
 
-<div class="tabs" style="margin-bottom:16px">
+<div class="tabs">
     <a href="reports.php?type=daily" class="<?php echo $type === "Daily" ? "active" : ""; ?>">Daily</a>
     <a href="reports.php?type=monthly" class="<?php echo $type === "Monthly" ? "active" : ""; ?>">Monthly</a>
 </div>
