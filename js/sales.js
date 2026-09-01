@@ -45,25 +45,17 @@ function removeSaleRow(btn) {
 
 function updateSaleTotal() {
     var lines = document.querySelectorAll("#cart-body .line-total");
-    var sub = 0;
+    var total = 0;
     for (var i = 0; i < lines.length; i++) {
-        sub += parseFloat(lines[i].textContent) || 0;
+        total += parseFloat(lines[i].textContent) || 0;
     }
-    var disc = parseFloat(document.getElementById("discount").value) || 0;
-    var amount = sub * disc / 100;
-    document.getElementById("sub-total").textContent = sub.toFixed(2);
-    document.getElementById("disc-amount").textContent = amount.toFixed(2);
-    document.getElementById("grand-total").textContent = (sub - amount).toFixed(2);
+    document.getElementById("grand-total").textContent = total.toFixed(2);
 }
 
 document.addEventListener("DOMContentLoaded", function () {
     var addBtn = document.getElementById("add-item-btn");
     if (addBtn) {
         addBtn.addEventListener("click", addSaleRow);
-    }
-    var disc = document.getElementById("discount");
-    if (disc) {
-        disc.addEventListener("input", updateSaleTotal);
     }
     var form = document.getElementById("sale-form");
     if (form) {

@@ -337,6 +337,9 @@ td {
 .badge-normal { background: #C8E6C9; color: #2E7D32; }
 .badge-warning { background: #FFE082; color: #F57F17; }
 .badge-critical { background: #FFCDD2; color: #C62828; }
+.badge-pending { background: #FFE082; color: #F57F17; }
+.badge-received { background: #C8E6C9; color: #2E7D32; }
+.badge-cancelled { background: #E0E0E0; color: #424242; }
 
 .tabs a {
     display: inline-block;

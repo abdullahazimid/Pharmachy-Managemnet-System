@@ -32,8 +32,8 @@ $current_page = basename($_SERVER["PHP_SELF"]);
         <li class="<?php echo $current_page === "suppliers.php" ? "active" : ""; ?>">
             <a href="suppliers.php">Suppliers</a>
         </li>
-        <li class="<?php echo $current_page === "antibiotics.php" ? "active" : ""; ?>">
-            <a href="antibiotics.php">Antibiotics</a>
+        <li class="<?php echo $current_page === "purchases.php" ? "active" : ""; ?>">
+            <a href="purchases.php">Purchases</a>
         </li>
         <li class="<?php echo $current_page === "inventory.php" ? "active" : ""; ?>">
             <a href="inventory.php">Inventory</a>
@@ -47,19 +47,8 @@ $current_page = basename($_SERVER["PHP_SELF"]);
             <a href="reports.php">Reports</a>
         </li>
         <?php } ?>
-        <?php if ($role === "Admin") { ?>
-        <li class="<?php echo $current_page === "salaries.php" ? "active" : ""; ?>">
-            <a href="salaries.php">Salaries</a>
-        </li>
-        <?php } ?>
-        <li class="<?php echo $current_page === "invoices.php" || $current_page === "invoice_print.php" ? "active" : ""; ?>">
-            <a href="invoices.php">Invoices</a>
-        </li>
-        <li class="<?php echo $current_page === "customers.php" ? "active" : ""; ?>">
-            <a href="customers.php">Customers</a>
-        </li>
         <li>
-            <a href="logout.php">Logout (<?php echo h($_SESSION["name"]); ?>)</a>
+            <a href="logout.php">Logout (<?php echo h($_SESSION["username"]); ?>)</a>
         </li>
     </ul>
 </aside>

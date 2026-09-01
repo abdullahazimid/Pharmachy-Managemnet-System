@@ -8,10 +8,10 @@ $role = $_SESSION["role"];
 
 $users = $conn->query("SELECT COUNT(*) AS c FROM users")->fetch_assoc()["c"];
 $medicines = $conn->query("SELECT COUNT(*) AS c FROM medicines")->fetch_assoc()["c"];
-$stock = $conn->query("SELECT COALESCE(SUM(quantity_in_stock), 0) AS c FROM medicines")->fetch_assoc()["c"];
-$sales = $conn->query("SELECT COALESCE(SUM(total_price), 0) AS c FROM sales_transactions")->fetch_assoc()["c"];
-$invoices = $conn->query("SELECT COUNT(*) AS c FROM invoices")->fetch_assoc()["c"];
-$customers = $conn->query("SELECT COUNT(*) AS c FROM customers")->fetch_assoc()["c"];
+$stock = $conn->query("SELECT COALESCE(SUM(current_stock), 0) AS c FROM inventory")->fetch_assoc()["c"];
+$sales_total = $conn->query("SELECT COALESCE(SUM(total_amount), 0) AS c FROM sales")->fetch_assoc()["c"];
+$purchases_total = $conn->query("SELECT COALESCE(SUM(total_amount), 0) AS c FROM purchases WHERE purchase_status = 'Received'")->fetch_assoc()["c"];
+$sales_count = $conn->query("SELECT COUNT(*) AS c FROM sales")->fetch_assoc()["c"];
 
 $profit = 0;
 $low_stock = [];
@@ -19,30 +19,32 @@ $near_expiry = [];
 
 if ($role === "Admin" || $role === "Pharmacist") {
     $p = $conn->query(
-        "SELECT COALESCE(SUM(st.total_price) - SUM(st.quantity_sold * m.purchase_price), 0) AS profit
-         FROM sales_transactions st
-         JOIN medicines m ON st.medicine_id = m.medicine_id"
+        "SELECT COALESCE(SUM(s.total_amount) - SUM(s.quantity_sold * m.purchase_price), 0) AS profit
+         FROM sales s
+         JOIN medicines m ON s.medicine_id = m.medicine_id"
     )->fetch_assoc();
     $profit = $p["profit"];
 
-    $days = EXPIRY_DAYS;
     $limit = LOW_STOCK;
     $stmt = $conn->prepare(
-        "SELECT medicine_id, medicine_name, quantity_in_stock, category, expiry_date
-         FROM medicines
-         WHERE quantity_in_stock < ?
-         ORDER BY quantity_in_stock ASC"
+        "SELECT m.medicine_id, m.medicine_name, i.current_stock, m.category, m.expire_date, i.stock_status
+         FROM inventory i
+         JOIN medicines m ON i.medicine_id = m.medicine_id
+         WHERE i.current_stock < ?
+         ORDER BY i.current_stock ASC"
     );
     $stmt->bind_param("i", $limit);
     $stmt->execute();
     $low_stock = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $stmt->close();
 
+    $days = EXPIRY_DAYS;
     $stmt = $conn->prepare(
-        "SELECT medicine_id, medicine_name, quantity_in_stock, category, expiry_date
-         FROM medicines
-         WHERE expiry_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY)
-         ORDER BY expiry_date ASC"
+        "SELECT m.medicine_id, m.medicine_name, i.current_stock, m.category, m.expire_date
+         FROM medicines m
+         JOIN inventory i ON m.medicine_id = i.medicine_id
+         WHERE m.expire_date <= DATE_ADD(CURDATE(), INTERVAL ? DAY)
+         ORDER BY m.expire_date ASC"
     );
     $stmt->bind_param("i", $days);
     $stmt->execute();
@@ -68,15 +70,15 @@ require_once "includes/header.php";
     </div>
     <div class="card-stat">
         <h3>Total sales</h3>
-        <p><?php echo number_format((float) $sales, 2); ?></p>
+        <p><?php echo number_format((float) $sales_total, 2); ?></p>
     </div>
     <div class="card-stat">
-        <h3>Invoices</h3>
-        <p><?php echo (int) $invoices; ?></p>
+        <h3>Total purchases</h3>
+        <p><?php echo number_format((float) $purchases_total, 2); ?></p>
     </div>
     <div class="card-stat">
-        <h3>Customers</h3>
-        <p><?php echo (int) $customers; ?></p>
+        <h3>Sales count</h3>
+        <p><?php echo (int) $sales_count; ?></p>
     </div>
     <?php if ($role === "Admin" || $role === "Pharmacist") { ?>
     <div class="card-stat">
@@ -99,7 +101,8 @@ require_once "includes/header.php";
                 <th>Medicine</th>
                 <th>Stock</th>
                 <th>Category</th>
-                <th>Expiry</th>
+                <th>Status</th>
+                <th>Expire</th>
             </tr>
         </thead>
         <tbody>
@@ -107,9 +110,10 @@ require_once "includes/header.php";
             <tr>
                 <td><?php echo (int) $row["medicine_id"]; ?></td>
                 <td><?php echo h($row["medicine_name"]); ?></td>
-                <td><?php echo (int) $row["quantity_in_stock"]; ?></td>
+                <td><?php echo (int) $row["current_stock"]; ?></td>
                 <td><?php echo h($row["category"]); ?></td>
-                <td><?php echo h($row["expiry_date"]); ?></td>
+                <td><?php echo h($row["stock_status"]); ?></td>
+                <td><?php echo h($row["expire_date"]); ?></td>
             </tr>
             <?php } ?>
         </tbody>
@@ -129,7 +133,7 @@ require_once "includes/header.php";
                 <th>Medicine</th>
                 <th>Stock</th>
                 <th>Category</th>
-                <th>Expiry</th>
+                <th>Expire</th>
             </tr>
         </thead>
         <tbody>
@@ -137,9 +141,9 @@ require_once "includes/header.php";
             <tr>
                 <td><?php echo (int) $row["medicine_id"]; ?></td>
                 <td><?php echo h($row["medicine_name"]); ?></td>
-                <td><?php echo (int) $row["quantity_in_stock"]; ?></td>
+                <td><?php echo (int) $row["current_stock"]; ?></td>
                 <td><?php echo h($row["category"]); ?></td>
-                <td><?php echo h($row["expiry_date"]); ?></td>
+                <td><?php echo h($row["expire_date"]); ?></td>
             </tr>
             <?php } ?>
         </tbody>

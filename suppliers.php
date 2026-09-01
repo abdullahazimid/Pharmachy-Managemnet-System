@@ -31,23 +31,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if ($action === "add" || $action === "edit") {
         $supplier_name = trim($_POST["supplier_name"] ?? "");
-        $contact_no = trim($_POST["contact_no"] ?? "");
-        $address = trim($_POST["address"] ?? "");
+        $contact_number = trim($_POST["contact_number"] ?? "");
         $company_name = trim($_POST["company_name"] ?? "");
         $id = (int) ($_POST["id"] ?? 0);
 
-        if ($supplier_name === "" || $contact_no === "" || $address === "" || $company_name === "") {
+        if ($supplier_name === "" || $contact_number === "" || $company_name === "") {
             $error = "All fields are required.";
         } elseif ($action === "add") {
-            $stmt = $conn->prepare("INSERT INTO suppliers (supplier_name, contact_no, address, company_name) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("ssss", $supplier_name, $contact_no, $address, $company_name);
+            $stmt = $conn->prepare("INSERT INTO suppliers (supplier_name, contact_number, company_name) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $supplier_name, $contact_number, $company_name);
             $stmt->execute();
             $stmt->close();
             header("Location: suppliers.php?msg=saved");
             exit;
         } else {
-            $stmt = $conn->prepare("UPDATE suppliers SET supplier_name=?, contact_no=?, address=?, company_name=? WHERE supplier_id=?");
-            $stmt->bind_param("ssssi", $supplier_name, $contact_no, $address, $company_name, $id);
+            $stmt = $conn->prepare("UPDATE suppliers SET supplier_name=?, contact_number=?, company_name=? WHERE supplier_id=?");
+            $stmt->bind_param("sssi", $supplier_name, $contact_number, $company_name, $id);
             $stmt->execute();
             $stmt->close();
             header("Location: suppliers.php?msg=saved");
@@ -88,12 +87,8 @@ require_once "includes/header.php";
                 <input type="text" name="company_name" required value="<?php echo h($edit["company_name"] ?? ""); ?>">
             </div>
             <div class="form-group">
-                <label>Contact</label>
-                <input type="text" name="contact_no" required value="<?php echo h($edit["contact_no"] ?? ""); ?>">
-            </div>
-            <div class="form-group">
-                <label>Address</label>
-                <input type="text" name="address" required value="<?php echo h($edit["address"] ?? ""); ?>">
+                <label>Contact number</label>
+                <input type="text" name="contact_number" required value="<?php echo h($edit["contact_number"] ?? ""); ?>">
             </div>
         </div>
         <div class="form-actions">
@@ -111,7 +106,6 @@ require_once "includes/header.php";
             <th>Supplier</th>
             <th>Company</th>
             <th>Contact</th>
-            <th>Address</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -121,8 +115,7 @@ require_once "includes/header.php";
             <td><?php echo (int) $row["supplier_id"]; ?></td>
             <td><?php echo h($row["supplier_name"]); ?></td>
             <td><?php echo h($row["company_name"]); ?></td>
-            <td><?php echo h($row["contact_no"]); ?></td>
-            <td><?php echo h($row["address"]); ?></td>
+            <td><?php echo h($row["contact_number"]); ?></td>
             <td>
                 <a class="edit" href="suppliers.php?edit=<?php echo (int) $row["supplier_id"]; ?>">Edit</a>
                 <form method="post" class="delete-form" style="display:inline">

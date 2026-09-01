@@ -16,7 +16,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($username === "" || $password === "") {
         $error = "Username and password required.";
     } else {
-        $stmt = $conn->prepare("SELECT user_id, name, role, username, password FROM users WHERE username = ?");
+        $stmt = $conn->prepare("SELECT user_id, role, username, password FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
         $user = $stmt->get_result()->fetch_assoc();
@@ -24,7 +24,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($user && password_verify($password, $user["password"])) {
             $_SESSION["user_id"] = $user["user_id"];
-            $_SESSION["name"] = $user["name"];
             $_SESSION["role"] = $user["role"];
             $_SESSION["username"] = $user["username"];
             header("Location: dashboard.php");

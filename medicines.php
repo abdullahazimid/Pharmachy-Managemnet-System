@@ -32,99 +32,65 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($action === "add" || $action === "edit") {
         $medicine_name = trim($_POST["medicine_name"] ?? "");
         $company_name = trim($_POST["company_name"] ?? "");
-        $category = $_POST["category"] ?? "General";
-        $unit_price = (float) ($_POST["unit_price"] ?? 0);
+        $category = trim($_POST["category"] ?? "General");
+        $sale_price = (float) ($_POST["sale_price"] ?? 0);
         $purchase_price = (float) ($_POST["purchase_price"] ?? 0);
-        $quantity_in_stock = (int) ($_POST["quantity_in_stock"] ?? 0);
-        $expiry_date = $_POST["expiry_date"] ?? "";
+        $expire_date = $_POST["expire_date"] ?? "";
         $manufacture_date = $_POST["manufacture_date"] ?? "";
+        $batch_number = trim($_POST["batch_number"] ?? "");
         $supplier_id = $_POST["supplier_id"] !== "" ? (int) $_POST["supplier_id"] : 0;
         $id = (int) ($_POST["id"] ?? 0);
         $user_id = (int) $_SESSION["user_id"];
 
-        if ($medicine_name === "" || $company_name === "" || $unit_price <= 0 || $expiry_date === "" || $manufacture_date === "") {
-            $error = "Name, company, price and dates are required.";
-        } elseif ($category !== "Antibiotic" && $category !== "General") {
-            $error = "Invalid category.";
+        if ($medicine_name === "" || $company_name === "" || $sale_price <= 0 || $expire_date === "" || $manufacture_date === "") {
+            $error = "Name, company, sale price and dates are required.";
         } else {
             if ($action === "add") {
                 $stmt = $conn->prepare(
-                    "INSERT INTO medicines (medicine_name, company_name, category, unit_price, purchase_price, quantity_in_stock, expiry_date, manufacture_date, supplier_id)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULLIF(?, 0))"
+                    "INSERT INTO medicines (medicine_name, company_name, category, purchase_price, expire_date, manufacture_date, supplier_id, sale_price, batch_number)
+                     VALUES (?, ?, ?, ?, ?, ?, NULLIF(?, 0), ?, ?)"
                 );
                 $stmt->bind_param(
-                    "sssddissi",
+                    "sssdssids",
                     $medicine_name,
                     $company_name,
                     $category,
-                    $unit_price,
                     $purchase_price,
-                    $quantity_in_stock,
-                    $expiry_date,
+                    $expire_date,
                     $manufacture_date,
-                    $supplier_id
+                    $supplier_id,
+                    $sale_price,
+                    $batch_number
                 );
                 $stmt->execute();
                 $new_id = $stmt->insert_id;
                 $stmt->close();
 
-                if ($quantity_in_stock > 0) {
-                    $log = $conn->prepare("INSERT INTO stock_inventory (medicine_id, quantity_added, quantity_sold, updated_by) VALUES (?, ?, 0, ?)");
-                    $log->bind_param("iii", $new_id, $quantity_in_stock, $user_id);
-                    $log->execute();
-                    $log->close();
-                }
-
-                if ($category === "Antibiotic") {
-                    $status = alert_status_for_stock($quantity_in_stock);
-                    $limit = 10;
-                    $ab = $conn->prepare("INSERT INTO antibiotic_list (medicine_id, allowed_range_limit, current_stock_level, alert_status) VALUES (?, ?, ?, ?)");
-                    $ab->bind_param("iiis", $new_id, $limit, $quantity_in_stock, $status);
-                    $ab->execute();
-                    $ab->close();
-                }
+                $status = alert_status_for_stock(0);
+                $inv = $conn->prepare("INSERT INTO inventory (medicine_id, current_stock, stock_status, updated_by) VALUES (?, 0, ?, ?)");
+                $inv->bind_param("isi", $new_id, $status, $user_id);
+                $inv->execute();
+                $inv->close();
             } else {
                 $stmt = $conn->prepare(
-                    "UPDATE medicines SET medicine_name=?, company_name=?, category=?, unit_price=?, purchase_price=?,
-                     quantity_in_stock=?, expiry_date=?, manufacture_date=?, supplier_id=NULLIF(?, 0) WHERE medicine_id=?"
+                    "UPDATE medicines SET medicine_name=?, company_name=?, category=?, purchase_price=?,
+                     expire_date=?, manufacture_date=?, supplier_id=NULLIF(?, 0), sale_price=?, batch_number=? WHERE medicine_id=?"
                 );
                 $stmt->bind_param(
-                    "sssddissii",
+                    "sssdssidsi",
                     $medicine_name,
                     $company_name,
                     $category,
-                    $unit_price,
                     $purchase_price,
-                    $quantity_in_stock,
-                    $expiry_date,
+                    $expire_date,
                     $manufacture_date,
                     $supplier_id,
+                    $sale_price,
+                    $batch_number,
                     $id
                 );
                 $stmt->execute();
                 $stmt->close();
-
-                if ($category === "Antibiotic") {
-                    $status = alert_status_for_stock($quantity_in_stock);
-                    $check = $conn->prepare("SELECT antibiotic_id FROM antibiotic_list WHERE medicine_id = ?");
-                    $check->bind_param("i", $id);
-                    $check->execute();
-                    $exists = $check->get_result()->fetch_assoc();
-                    $check->close();
-
-                    if ($exists) {
-                        $up = $conn->prepare("UPDATE antibiotic_list SET current_stock_level=?, alert_status=? WHERE medicine_id=?");
-                        $up->bind_param("isi", $quantity_in_stock, $status, $id);
-                        $up->execute();
-                        $up->close();
-                    } else {
-                        $limit = 10;
-                        $ab = $conn->prepare("INSERT INTO antibiotic_list (medicine_id, allowed_range_limit, current_stock_level, alert_status) VALUES (?, ?, ?, ?)");
-                        $ab->bind_param("iiis", $id, $limit, $quantity_in_stock, $status);
-                        $ab->execute();
-                        $ab->close();
-                    }
-                }
             }
 
             header("Location: medicines.php?msg=saved");
@@ -144,9 +110,10 @@ if (isset($_GET["edit"])) {
 
 $suppliers = $conn->query("SELECT supplier_id, supplier_name FROM suppliers ORDER BY supplier_name")->fetch_all(MYSQLI_ASSOC);
 $rows = $conn->query(
-    "SELECT m.*, s.supplier_name
+    "SELECT m.*, s.supplier_name, COALESCE(i.current_stock, 0) AS current_stock, i.stock_status
      FROM medicines m
      LEFT JOIN suppliers s ON m.supplier_id = s.supplier_id
+     LEFT JOIN inventory i ON m.medicine_id = i.medicine_id
      ORDER BY m.medicine_id"
 )->fetch_all(MYSQLI_ASSOC);
 
@@ -178,6 +145,10 @@ require_once "includes/header.php";
                 </select>
             </div>
             <div class="form-group">
+                <label>Batch number</label>
+                <input type="text" name="batch_number" value="<?php echo h($edit["batch_number"] ?? ""); ?>">
+            </div>
+            <div class="form-group">
                 <label>Supplier</label>
                 <select name="supplier_id">
                     <option value="">None</option>
@@ -191,24 +162,20 @@ require_once "includes/header.php";
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>Unit price</label>
-                <input type="number" step="0.01" name="unit_price" required value="<?php echo h($edit["unit_price"] ?? ""); ?>">
+                <label>Sale price</label>
+                <input type="number" step="0.01" name="sale_price" required value="<?php echo h($edit["sale_price"] ?? ""); ?>">
             </div>
             <div class="form-group">
                 <label>Purchase price</label>
                 <input type="number" step="0.01" name="purchase_price" value="<?php echo h($edit["purchase_price"] ?? "0"); ?>">
             </div>
             <div class="form-group">
-                <label>Stock</label>
-                <input type="number" name="quantity_in_stock" value="<?php echo h($edit["quantity_in_stock"] ?? "0"); ?>">
-            </div>
-            <div class="form-group">
                 <label>Manufacture date</label>
                 <input type="date" name="manufacture_date" required value="<?php echo h($edit["manufacture_date"] ?? ""); ?>">
             </div>
             <div class="form-group">
-                <label>Expiry date</label>
-                <input type="date" name="expiry_date" required value="<?php echo h($edit["expiry_date"] ?? ""); ?>">
+                <label>Expire date</label>
+                <input type="date" name="expire_date" required value="<?php echo h($edit["expire_date"] ?? ""); ?>">
             </div>
         </div>
         <div class="form-actions">
@@ -226,9 +193,11 @@ require_once "includes/header.php";
             <th>Name</th>
             <th>Company</th>
             <th>Category</th>
-            <th>Unit price</th>
+            <th>Batch</th>
+            <th>Sale price</th>
             <th>Stock</th>
-            <th>Expiry</th>
+            <th>Status</th>
+            <th>Expire</th>
             <th>Supplier</th>
             <th>Action</th>
         </tr>
@@ -242,9 +211,11 @@ require_once "includes/header.php";
             <td>
                 <span class="badge badge-<?php echo strtolower($row["category"]); ?>"><?php echo h($row["category"]); ?></span>
             </td>
-            <td><?php echo number_format((float) $row["unit_price"], 2); ?></td>
-            <td><?php echo (int) $row["quantity_in_stock"]; ?></td>
-            <td><?php echo h($row["expiry_date"]); ?></td>
+            <td><?php echo h($row["batch_number"]); ?></td>
+            <td><?php echo number_format((float) $row["sale_price"], 2); ?></td>
+            <td><?php echo (int) $row["current_stock"]; ?></td>
+            <td><?php echo h($row["stock_status"] ?? "Normal"); ?></td>
+            <td><?php echo h($row["expire_date"]); ?></td>
             <td><?php echo h($row["supplier_name"] ?? ""); ?></td>
             <td>
                 <a class="edit" href="medicines.php?edit=<?php echo (int) $row["medicine_id"]; ?>">Edit</a>
