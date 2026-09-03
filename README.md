@@ -76,8 +76,8 @@ You should see the login page.
 | Role        | Username | Password  |
 |-------------|----------|-----------|
 | Admin       | admin    | admin123  |
-| Pharmacist  | rafiq    | pharma123 |
-| Employee    | tariq    | emp123    |
+| Pharmacist  | azim    | pharma123 |
+| Employee    | ontim    | emp123    |
 
 Wrong password should show an error and stay on login.
 
@@ -92,12 +92,12 @@ Wrong password should show an error and stay on login.
 - After sale, stock goes down and an invoice print page opens
 - Open **Reports** — Daily and Monthly totals appear from real sales
 
-### 2. Pharmacist (`rafiq` / `pharma123`)
+### 2. Pharmacist (`azim` / `pharma123`)
 
 - Can open Medicines, Inventory, Antibiotics, Sales, Reports
 - Cannot open **Users** or **Salaries** (redirects to Dashboard)
 
-### 3. Employee (`tariq` / `emp123`)
+### 3. Employee (`ontim` / `emp123`)
 
 - Can open Dashboard, Sales, Invoices, Customers
 - Cannot open Medicines, Inventory, Users, Salaries, Reports
