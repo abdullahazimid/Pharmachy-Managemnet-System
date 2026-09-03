@@ -264,6 +264,7 @@ $edit_category = medicine_category_label($edit["category"] ?? "Medicine");
             <th>Category</th>
             <th>Batch</th>
             <th>Sale price</th>
+            <th>Purchase price</th>
             <th>Stock</th>
             <th>Status</th>
             <th>Expire</th>
@@ -282,6 +283,7 @@ $edit_category = medicine_category_label($edit["category"] ?? "Medicine");
             </td>
             <td><?php echo h($row["batch_number"]); ?></td>
             <td><?php echo number_format((float) $row["sale_price"], 2); ?></td>
+            <td><?php echo number_format((float) $row["purchase_price"], 2); ?></td>
             <td><?php echo (int) $row["current_stock"]; ?></td>
             <td><?php echo h($row["stock_status"] ?? "Normal"); ?></td>
             <td><?php echo h($row["expire_date"]); ?></td>

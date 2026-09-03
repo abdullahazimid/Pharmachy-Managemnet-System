@@ -109,12 +109,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $up->bind_param("isii", $next, $status, $user_id, $medicine_id);
                     $up->execute();
                     $up->close();
-                }
 
-                $mp = $conn->prepare("UPDATE medicines SET purchase_price = ? WHERE medicine_id = ?");
-                $mp->bind_param("di", $purchase_price, $medicine_id);
-                $mp->execute();
-                $mp->close();
+                    $mp = $conn->prepare("UPDATE medicines SET purchase_price = ? WHERE medicine_id = ?");
+                    $mp->bind_param("di", $purchase_price, $medicine_id);
+                    $mp->execute();
+                    $mp->close();
+                }
             } else {
                 $old = $conn->prepare("SELECT * FROM purchases WHERE purchase_id = ?");
                 $old->bind_param("i", $id);
@@ -167,12 +167,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             $up->bind_param("isii", $next, $status, $user_id, $medicine_id);
                             $up->execute();
                             $up->close();
-                        }
 
-                        $mp = $conn->prepare("UPDATE medicines SET purchase_price = ? WHERE medicine_id = ?");
-                        $mp->bind_param("di", $purchase_price, $medicine_id);
-                        $mp->execute();
-                        $mp->close();
+                            $mp = $conn->prepare("UPDATE medicines SET purchase_price = ? WHERE medicine_id = ?");
+                            $mp->bind_param("di", $purchase_price, $medicine_id);
+                            $mp->execute();
+                            $mp->close();
+                        }
                     }
                 }
             }
@@ -249,7 +249,7 @@ require_once "includes/header.php";
                 <input type="number" name="quantity" required min="1" value="<?php echo h($edit["quantity"] ?? ""); ?>">
             </div>
             <div class="form-group">
-                <label>Purchase price (per unit)</label>
+                <label>Unit price</label>
                 <input type="number" step="0.01" name="purchase_price" required value="<?php echo h($edit["purchase_price"] ?? ""); ?>">
             </div>
             <div class="form-group">
