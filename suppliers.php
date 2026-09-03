@@ -16,6 +16,15 @@ if (isset($_GET["msg"]) && $_GET["msg"] === "deleted") {
     $msg = "Deleted.";
 }
 
+$is_ajax = !empty($_POST["ajax"]);
+
+function supplier_json_response($data)
+{
+    header("Content-Type: application/json");
+    echo json_encode($data);
+    exit;
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $action = $_POST["action"] ?? "";
 
@@ -37,13 +46,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($supplier_name === "" || $contact_number === "" || $company_name === "") {
             $error = "All fields are required.";
+            if ($is_ajax) {
+                supplier_json_response(["ok" => false, "error" => $error]);
+            }
         } elseif ($action === "add") {
             $stmt = $conn->prepare("INSERT INTO suppliers (supplier_name, contact_number, company_name) VALUES (?, ?, ?)");
             $stmt->bind_param("sss", $supplier_name, $contact_number, $company_name);
-            $stmt->execute();
-            $stmt->close();
-            header("Location: suppliers.php?msg=saved");
-            exit;
+            if (!$stmt->execute()) {
+                $stmt->close();
+                $error = "Could not save supplier.";
+                if ($is_ajax) {
+                    supplier_json_response(["ok" => false, "error" => $error]);
+                }
+            } else {
+                $new_id = (int) $stmt->insert_id;
+                $stmt->close();
+                if ($is_ajax) {
+                    supplier_json_response([
+                        "ok" => true,
+                        "supplier_id" => $new_id,
+                        "supplier_name" => $supplier_name,
+                    ]);
+                }
+                header("Location: suppliers.php?msg=saved");
+                exit;
+            }
         } else {
             $stmt = $conn->prepare("UPDATE suppliers SET supplier_name=?, contact_number=?, company_name=? WHERE supplier_id=?");
             $stmt->bind_param("sssi", $supplier_name, $contact_number, $company_name, $id);

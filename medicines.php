@@ -50,8 +50,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $error = "Category must be Medicine or Antibiotics.";
         } elseif ($action === "add" && $quantity < 0) {
             $error = "Quantity cannot be negative.";
+        } elseif ($action === "add" && $quantity > 0 && $supplier_id <= 0) {
+            $error = "Select a supplier for the initial stock purchase.";
+        } elseif ($action === "add" && $quantity > 0 && $purchase_price <= 0) {
+            $error = "Purchase price is required when adding initial stock.";
         } else {
             if ($action === "add") {
+                $conn->begin_transaction();
+                $ok = true;
+
                 $stmt = $conn->prepare(
                     "INSERT INTO medicines (medicine_name, company_name, category, purchase_price, expire_date, manufacture_date, supplier_id, sale_price, batch_number)
                      VALUES (?, ?, ?, ?, ?, ?, NULLIF(?, 0), ?, ?)"
@@ -68,15 +75,61 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $sale_price,
                     $batch_number
                 );
-                $stmt->execute();
-                $new_id = $stmt->insert_id;
+                if (!$stmt->execute()) {
+                    $ok = false;
+                    $error = "Could not save medicine.";
+                }
+                $new_id = (int) $stmt->insert_id;
                 $stmt->close();
 
-                $status = alert_status_for_stock($quantity);
-                $inv = $conn->prepare("INSERT INTO inventory (medicine_id, current_stock, stock_status, updated_by) VALUES (?, ?, ?, ?)");
-                $inv->bind_param("iisi", $new_id, $quantity, $status, $user_id);
-                $inv->execute();
-                $inv->close();
+                if ($ok && $new_id <= 0) {
+                    $ok = false;
+                    $error = "Could not save medicine.";
+                }
+
+                if ($ok) {
+                    $status = alert_status_for_stock($quantity);
+                    $inv = $conn->prepare("INSERT INTO inventory (medicine_id, current_stock, stock_status, updated_by) VALUES (?, ?, ?, ?)");
+                    $inv->bind_param("iisi", $new_id, $quantity, $status, $user_id);
+                    if (!$inv->execute()) {
+                        $ok = false;
+                        $error = "Could not save inventory.";
+                    }
+                    $inv->close();
+                }
+
+                // Initial purchase is a history record only — do not add quantity to inventory again.
+                if ($ok && $quantity > 0) {
+                    $total_amount = $quantity * $purchase_price;
+                    $purchase_status = "Received";
+                    $purchase_date = date("Y-m-d");
+                    $pur = $conn->prepare(
+                        "INSERT INTO purchases (supplier_id, purchase_date, medicine_id, quantity, purchase_price, total_amount, purchase_status)
+                         VALUES (?, ?, ?, ?, ?, ?, ?)"
+                    );
+                    $pur->bind_param(
+                        "isiidds",
+                        $supplier_id,
+                        $purchase_date,
+                        $new_id,
+                        $quantity,
+                        $purchase_price,
+                        $total_amount,
+                        $purchase_status
+                    );
+                    if (!$pur->execute()) {
+                        $ok = false;
+                        $error = "Could not save initial purchase.";
+                    }
+                    $pur->close();
+                }
+
+                if ($ok) {
+                    $conn->commit();
+                    header("Location: medicines.php?msg=saved");
+                    exit;
+                }
+                $conn->rollback();
             } else {
                 $stmt = $conn->prepare(
                     "UPDATE medicines SET medicine_name=?, company_name=?, category=?, purchase_price=?,
@@ -97,10 +150,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 );
                 $stmt->execute();
                 $stmt->close();
+                header("Location: medicines.php?msg=saved");
+                exit;
             }
-
-            header("Location: medicines.php?msg=saved");
-            exit;
         }
     }
 }
@@ -164,14 +216,17 @@ $edit_category = medicine_category_label($edit["category"] ?? "Medicine");
             </div>
             <div class="form-group">
                 <label>Supplier</label>
-                <select name="supplier_id">
-                    <option value="">None</option>
-                    <?php foreach ($suppliers as $s) { ?>
-                    <option value="<?php echo (int) $s["supplier_id"]; ?>" <?php echo (isset($edit["supplier_id"]) && (int) $edit["supplier_id"] === (int) $s["supplier_id"]) ? "selected" : ""; ?>>
-                        <?php echo h($s["supplier_name"]); ?>
-                    </option>
-                    <?php } ?>
-                </select>
+                <div class="input-with-btn">
+                    <select name="supplier_id" id="supplier-select">
+                        <option value="">None</option>
+                        <?php foreach ($suppliers as $s) { ?>
+                        <option value="<?php echo (int) $s["supplier_id"]; ?>" <?php echo (isset($edit["supplier_id"]) && (int) $edit["supplier_id"] === (int) $s["supplier_id"]) ? "selected" : ""; ?>>
+                            <?php echo h($s["supplier_name"]); ?>
+                        </option>
+                        <?php } ?>
+                    </select>
+                    <button type="button" class="add-btn" id="open-supplier-modal">+ Add Supplier</button>
+                </div>
             </div>
         </div>
         <div class="form-row">
@@ -243,5 +298,28 @@ $edit_category = medicine_category_label($edit["category"] ?? "Medicine");
         <?php } ?>
     </tbody>
 </table>
+
+<div id="supplier-modal" class="modal" aria-hidden="true">
+    <div class="modal-card">
+        <h2>Add supplier</h2>
+        <p id="supplier-modal-error" class="msg-err" hidden></p>
+        <div class="form-group">
+            <label>Supplier name</label>
+            <input type="text" id="modal-supplier-name">
+        </div>
+        <div class="form-group">
+            <label>Company name</label>
+            <input type="text" id="modal-company-name">
+        </div>
+        <div class="form-group">
+            <label>Contact number</label>
+            <input type="text" id="modal-contact-number">
+        </div>
+        <div class="form-actions">
+            <button type="button" class="save-btn" id="save-supplier-btn">Save Supplier</button>
+            <button type="button" class="cancel-btn" id="cancel-supplier-btn">Cancel</button>
+        </div>
+    </div>
+</div>
 
 <?php require_once "includes/footer.php"; ?>
